@@ -25,7 +25,7 @@ class WSUtils {
         fun getPlacesTest(): ArrayList<UserBean> {
 
             val userListJson =
-                OkhttpUtils().sendGetOkHttpRequest("${Constant.URL}/getPlaces")
+                OkhttpUtils().sendGetOkHttpRequest("${Constant.URL}/places")
 
             val myType = object : TypeToken<List<UserBean>>() {}.type
             return gson.fromJson(userListJson, myType)

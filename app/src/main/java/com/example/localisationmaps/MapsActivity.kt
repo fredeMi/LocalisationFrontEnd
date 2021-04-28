@@ -1,18 +1,25 @@
 package com.example.localisationmaps
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Criteria
+import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.emptyapplication.WSUtils
+import com.google.android.gms.maps.CameraUpdateFactory
 
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import kotlin.concurrent.thread
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -26,20 +33,26 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        //Demande permission
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            //Pas la permission
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                0
-            )
-        }
+//        //Demande permission
+//        if (ContextCompat.checkSelfPermission(
+//                this,
+//                Manifest.permission.ACCESS_FINE_LOCATION
+//            ) != PackageManager.PERMISSION_GRANTED
+//        ) {
+//            //Pas la permission
+//            ActivityCompat.requestPermissions(
+//                this,
+//                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+//                0
+//            )
+//        }
     }
+
+//    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+//        refreshData()
+//    }
+
 
     /**
      * Manipulates the map once available.
@@ -54,12 +67,43 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
 
         // appel fction getPlaces(user) pour recup liste
-        val myList = WSUtils.getPlacesTest()
-
-        // pour chaque point de la liste faire addMarker
-        for (user in myList){
-            val userMarker = LatLng(user.lat, user.lon)
-            mMap.addMarker(MarkerOptions().position(userMarker).title(user.pseudo))
+        thread {
+            try {
+                val myList = WSUtils.getPlacesTest()
+                runOnUiThread {
+                    for (user in myList) {
+                        val userMarker = LatLng(user.lat, user.lon)
+                        mMap.addMarker(MarkerOptions().position(userMarker).title(user.pseudo))
+                    }
+                }
+            } catch (e: Exception) {
+                println(e.message)
+            }
         }
+        // pour chaque point de la liste faire addMarker
     }
+
+//    fun getLocation() {
+//            if (mMap != null) {
+//                runOnUiThread {
+//
+//                    //Si permission j'affiche
+//                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+//                        mMap.isMyLocationEnabled = true
+//                        //Récupération de la localisation
+//                        val lm = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+//                        val location = lm.getLastKnownLocation(lm.getBestProvider(Criteria(), false)!!)
+//                        if (location != null) {
+//                            try {
+//
+//                            } catch (e: Exception) {
+//                                e.printStackTrace()
+//                                Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+//                            }
+//                        }
+//                    }
+//
+//                }
+//            }
+//        }
 }

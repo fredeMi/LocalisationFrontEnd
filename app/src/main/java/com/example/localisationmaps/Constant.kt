@@ -2,6 +2,6 @@ package com.example.localisationmaps
 
 class Constant {
     companion object {
-        val URL = "90.89.201.68:8080"
+        const val URL = "http://90.89.201.68:8080"
     }
 }
