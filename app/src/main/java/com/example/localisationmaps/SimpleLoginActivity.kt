@@ -24,8 +24,7 @@ class SimpleLoginActivity : AppCompatActivity() {
 
     fun onBtnLoginClick(view: View) {
         println("********************************clic")
-        var mydate = DateFormat.getDateInstance()
-        val user = UserBean(0, null,0.0, 0.0,  tvPseudo.text.toString(), tvPwd.text.toString(), mydate)
+        val user = UserBean(0, null,0.0, 0.0,  tvPseudo.text.toString(), tvPwd.text.toString(), null)
         thread {
             val mySession = WSUtils.login(user)
             runOnUiThread { println("**************************"+mySession.session_id) }
