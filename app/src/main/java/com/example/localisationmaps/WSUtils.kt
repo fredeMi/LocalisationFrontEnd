@@ -11,7 +11,6 @@ class WSUtils {
         val gson = Gson()
 
         fun updatePlace(user: UserBean) {
-
             val userInJson = gson.toJson(user)
              OkhttpUtils().sendPostOkHttpRequest("${Constant.URL}/updatePlace", userInJson)
         }

@@ -7,23 +7,20 @@ import android.location.Criteria
 import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.emptyapplication.WSUtils
-import com.google.android.gms.maps.CameraUpdateFactory
 
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlin.concurrent.thread
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
-    private lateinit var mMap: GoogleMap
+    private var mMap: GoogleMap? = null
     val data = ArrayList<UserBean>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,14 +44,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 0
             )
         }
-        loadData()
         thread {
             var location = getLocation()
-            while (location == null) {
-                Thread.sleep(5000)
+            while (true) {
+                loadData()
                 location = getLocation()
+                refreshMap()
+                Thread.sleep(5000)
             }
             //TODO mise à jour localisation sur serveur
+
+//            WSUtils.updatePlace()
         }
     }
 
@@ -78,13 +78,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      * installed Google Play services and returned to the app.
      */
     override fun onMapReady(googleMap: GoogleMap) {
-        println("c parti")
+        println("c parti*******************")
         mMap = googleMap
+        println(mMap)
         refreshMap()
     }
 
 
-    fun getLocation() {
+    fun getLocation(): CoordBean? {
+        println("****************************************************************")
+        println(mMap)
         if (mMap != null) {
 
             //Si permission j'affiche
@@ -93,32 +96,28 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     Manifest.permission.ACCESS_FINE_LOCATION
                 ) == PackageManager.PERMISSION_GRANTED
             ) {
-                mMap.isMyLocationEnabled = true
+                println("***********************g la permission")
+                runOnUiThread {
+                mMap?.isMyLocationEnabled = true
+                }
                 //Récupération de la localisation
+                println("*************************je passe à recup de la localisation")
                 val lm = getSystemService(Context.LOCATION_SERVICE) as LocationManager
                 val location = lm.getLastKnownLocation(lm.getBestProvider(Criteria(), false)!!)
                 if (location != null) {
-                    var myUser = UserBean(
-                        1,
-                        location.latitude,
-                        location.longitude,
-                        "Titi",
-                        "blabla",
-                        123456
-                    )
-                    thread {
-                        try {
-                            WSUtils.updatePlace(myUser)
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                            Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
-                        }
-                    }
+                    return CoordBean(location.latitude, location.longitude)
+//                        try {
+//                            WSUtils.updatePlace
+//                        } catch (e: Exception) {
+//                            e.printStackTrace()
+//                            Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+//                        }
                 }
             }
-
         }
+        return null
     }
+
 
 
     fun refreshMap() {
@@ -131,12 +130,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     Manifest.permission.ACCESS_FINE_LOCATION
                 ) == PackageManager.PERMISSION_GRANTED
             ) {
-                mMap.isMyLocationEnabled = true
+                mMap?.isMyLocationEnabled = true
             }
-            mMap.clear()
+            mMap?.clear()
             for (user in data) {
                 val userMarker = LatLng(user.lat, user.lon)
-                mMap.addMarker(MarkerOptions().position(userMarker).title(user.pseudo))
+                mMap?.addMarker(MarkerOptions().position(userMarker).title(user.pseudo))
             }
         }
     }
