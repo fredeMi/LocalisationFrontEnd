@@ -50,7 +50,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             while (true) {
                 val location = getLocation()
                 if (location != null) {
-                    val myUser = UserBean(1, location.lat, location.lon, "Titi", pwd = null, timestamp = null)
+                    val myUser = UserBean(1, null, location.lat, location.lon, "Titi", pwd = null, timestamp = null)
                     try {
                         WSUtils.updatePlace(myUser)
                     } catch (e: Exception) {

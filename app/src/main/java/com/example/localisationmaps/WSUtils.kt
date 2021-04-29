@@ -1,6 +1,7 @@
 package com.example.emptyapplication
 
 import com.example.localisationmaps.Constant
+import com.example.localisationmaps.SessionBean
 import com.example.localisationmaps.UserBean
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -25,13 +26,12 @@ class WSUtils {
             return gson.fromJson(userListJson, myType)
         }
 
-//        fun login(user: UserBean){
-//            println("********************login")
-//        }
 
-        fun login(user: UserBean){
+        fun login(user: UserBean):SessionBean{
             val userInJson = gson.toJson(user)
-            OkhttpUtils().sendPostOkHttpRequest("${Constant.URL}/login", userInJson)
+            val sessionOk = OkhttpUtils().sendPostOkHttpRequest("${Constant.URL}/login", userInJson)
+            val mySession = object : TypeToken<SessionBean>() {}.type
+            return gson.fromJson(sessionOk,mySession)
         }
 
     }
