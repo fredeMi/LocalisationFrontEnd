@@ -25,6 +25,10 @@ class WSUtils {
             return gson.fromJson(userListJson, myType)
         }
 
+//        fun login(user: UserBean){
+//            println("********************login")
+//        }
+
     }
 
 }

@@ -7,6 +7,7 @@ import android.location.Criteria
 import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.emptyapplication.WSUtils
@@ -45,16 +46,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             )
         }
         thread {
-            var location = getLocation()
             while (true) {
+                val location = getLocation()
+                if (location != null) {
+                    val myUser = UserBean(1, location.lat, location.lon, "Titi", pwd = null, timestamp = null)
+                    try {
+                        WSUtils.updatePlace(myUser)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
                 loadData()
-                location = getLocation()
                 refreshMap()
                 Thread.sleep(5000)
             }
-            //TODO mise à jour localisation sur serveur
-
-//            WSUtils.updatePlace()
         }
     }
 
@@ -98,7 +104,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             ) {
                 println("***********************g la permission")
                 runOnUiThread {
-                mMap?.isMyLocationEnabled = true
+                    mMap?.isMyLocationEnabled = true
                 }
                 //Récupération de la localisation
                 println("*************************je passe à recup de la localisation")
@@ -106,18 +112,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 val location = lm.getLastKnownLocation(lm.getBestProvider(Criteria(), false)!!)
                 if (location != null) {
                     return CoordBean(location.latitude, location.longitude)
-//                        try {
-//                            WSUtils.updatePlace
-//                        } catch (e: Exception) {
-//                            e.printStackTrace()
-//                            Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
-//                        }
                 }
             }
         }
         return null
     }
-
 
 
     fun refreshMap() {
