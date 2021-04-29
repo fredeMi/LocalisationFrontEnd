@@ -29,6 +29,11 @@ class WSUtils {
 //            println("********************login")
 //        }
 
+        fun login(user: UserBean){
+            val userInJson = gson.toJson(user)
+            OkhttpUtils().sendPostOkHttpRequest("${Constant.URL}/login", userInJson)
+        }
+
     }
 
 }
