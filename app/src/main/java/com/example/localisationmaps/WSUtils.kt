@@ -10,19 +10,14 @@ class WSUtils {
     companion object {
         val gson = Gson()
 
-//        fun getPlaces(user: UserBean): ArrayList<UserBean> {
-//
-//            val userInJson = gson.toJson(user)
-//
-//            val userListJson =
-//                OkhttpUtils().sendPostOkHttpRequest("${Constant.URL}/getPlaces", userInJson)
-//
-//            val myType = object : TypeToken<List<UserBean>>() {}.type
-//            return gson.fromJson(userListJson, myType)
-//        }
+        fun updatePlace(user: UserBean) {
+
+            val userInJson = gson.toJson(user)
+             OkhttpUtils().sendPostOkHttpRequest("${Constant.URL}/updatePlace", userInJson)
+        }
 
 
-        fun getPlacesTest(): ArrayList<UserBean> {
+        fun getPlaces(): ArrayList<UserBean> {
 
             val userListJson =
                 OkhttpUtils().sendGetOkHttpRequest("${Constant.URL}/places")

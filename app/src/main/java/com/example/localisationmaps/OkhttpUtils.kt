@@ -1,5 +1,6 @@
 package com.example.emptyapplication
 
+import com.example.localisationmaps.ErrorBean
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -31,7 +32,15 @@ class OkhttpUtils {
         val response = client.newCall(request).execute()
         //Analyse du code retour
         return if (response.code !in 200..299) {
+            if(response.code==500){
+                var rep = response.body?.string() ?: ""
+                if (rep.contains("\"message\"")){
+                    var errorBean = WSUtils.gson.fromJson(rep,ErrorBean::class.java)
+                    throw Exception("Réponse du serveur : ${errorBean.message}")
+                    }
+            }
             throw Exception("Réponse du serveur incorrect : ${response.code}")
+
         }
         else {
         //Résultat de la requete

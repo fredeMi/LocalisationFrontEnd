@@ -24,6 +24,7 @@ import kotlin.concurrent.thread
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
+    val data = ArrayList<UserBean>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,25 +34,38 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-//        //Demande permission
-//        if (ContextCompat.checkSelfPermission(
-//                this,
-//                Manifest.permission.ACCESS_FINE_LOCATION
-//            ) != PackageManager.PERMISSION_GRANTED
-//        ) {
-//            //Pas la permission
-//            ActivityCompat.requestPermissions(
-//                this,
-//                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-//                0
-//            )
-//        }
+        //Demande permission
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            //Pas la permission
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                0
+            )
+        }
+        loadData()
+        thread {
+            var location = getLocation()
+            while (location == null) {
+                Thread.sleep(5000)
+                location = getLocation()
+            }
+            //TODO mise à jour localisation sur serveur
+        }
     }
 
-//    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-//        refreshData()
-//    }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        refreshMap()
+    }
 
 
     /**
@@ -64,46 +78,80 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      * installed Google Play services and returned to the app.
      */
     override fun onMapReady(googleMap: GoogleMap) {
+        println("c parti")
         mMap = googleMap
-
-        // appel fction getPlaces(user) pour recup liste
-        thread {
-            try {
-                val myList = WSUtils.getPlacesTest()
-                runOnUiThread {
-                    for (user in myList) {
-                        val userMarker = LatLng(user.lat, user.lon)
-                        mMap.addMarker(MarkerOptions().position(userMarker).title(user.pseudo))
-                    }
-                }
-            } catch (e: Exception) {
-                println(e.message)
-            }
-        }
-        // pour chaque point de la liste faire addMarker
+        refreshMap()
     }
 
-//    fun getLocation() {
-//            if (mMap != null) {
-//                runOnUiThread {
-//
-//                    //Si permission j'affiche
-//                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-//                        mMap.isMyLocationEnabled = true
-//                        //Récupération de la localisation
-//                        val lm = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-//                        val location = lm.getLastKnownLocation(lm.getBestProvider(Criteria(), false)!!)
-//                        if (location != null) {
-//                            try {
-//
-//                            } catch (e: Exception) {
-//                                e.printStackTrace()
-//                                Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
-//                            }
-//                        }
-//                    }
-//
-//                }
-//            }
-//        }
+
+    fun getLocation() {
+        if (mMap != null) {
+
+            //Si permission j'affiche
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                mMap.isMyLocationEnabled = true
+                //Récupération de la localisation
+                val lm = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                val location = lm.getLastKnownLocation(lm.getBestProvider(Criteria(), false)!!)
+                if (location != null) {
+                    var myUser = UserBean(
+                        1,
+                        location.latitude,
+                        location.longitude,
+                        "Titi",
+                        "blabla",
+                        123456
+                    )
+                    thread {
+                        try {
+                            WSUtils.updatePlace(myUser)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+
+
+    fun refreshMap() {
+        if (mMap == null) {
+            return
+        }
+        runOnUiThread {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                mMap.isMyLocationEnabled = true
+            }
+            mMap.clear()
+            for (user in data) {
+                val userMarker = LatLng(user.lat, user.lon)
+                mMap.addMarker(MarkerOptions().position(userMarker).title(user.pseudo))
+            }
+        }
+    }
+
+    fun loadData() {
+        thread {
+            try {
+                val myList = WSUtils.getPlaces()
+                data.clear()
+                data.addAll(myList)
+                refreshMap()
+            } catch (e: Exception) {
+                e.printStackTrace()
+//                TODO gérer affichage erreur sur IHM
+            }
+        }
+    }
 }
