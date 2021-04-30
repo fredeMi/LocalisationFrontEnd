@@ -1,6 +1,7 @@
 package com.example.localisationmaps
 
 import android.content.Intent
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 
 import android.os.Bundle
@@ -11,10 +12,25 @@ import java.text.DateFormat
 import java.util.*
 import kotlin.concurrent.thread
 
-class SimpleLoginActivity : AppCompatActivity() {
+class SimpleLoginActivity : AppCompatActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_simple_login)
+    }
+
+    override fun onClick(v: View?) {
+        when (v) {
+            btnLogin -> {
+                if (tvPseudo.text.toString().isEmpty() && tvPwd.text.toString().isEmpty()){
+                    setErrorOnUiThread("Les champs doivent etre rempli")
+                }
+            }
+            btnSubscribe -> {
+                if (tvPseudo.text.toString().isEmpty() && tvPwd.text.toString().isEmpty()){
+                    setErrorOnUiThread("Les champs doivent etre rempli")
+                }
+            }
+        }
     }
 
     fun onBtnLoginClick(view: View) {
@@ -28,8 +44,6 @@ class SimpleLoginActivity : AppCompatActivity() {
                     val intent = Intent(this, MapsActivity::class.java)
                     intent.putExtra("sessionId",mySession.sessionId)
                     startActivity(intent)
-                } else {
-                    setErrorOnUiThread("Erreur de connexion")
                 }
             }
         }
@@ -45,8 +59,6 @@ class SimpleLoginActivity : AppCompatActivity() {
                     val intent = Intent(this, MapsActivity::class.java)
                     intent.putExtra("sessionId",mySession.sessionId)
                     startActivity(intent)
-                } else {
-                    setErrorOnUiThread("Erreur pendant l'inscription")
                 }
         }
     }
