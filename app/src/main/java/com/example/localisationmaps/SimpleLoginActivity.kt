@@ -17,17 +17,19 @@ class SimpleLoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_simple_login)
     }
 
-
     fun onBtnLoginClick(view: View) {
         println("********************************clic")
         val user = UserBean(null,null, null,  tvPseudo.text.toString(), tvPwd.text.toString())
         thread {
             val mySession = WSUtils.login(user)
-            runOnUiThread { println("**************************session:${mySession.sessionId} et success = ${mySession.success}")
+            runOnUiThread {
+//                println("**************************session:${mySession.sessionId} et success = ${mySession.success}")
                 if (mySession.success){
                     val intent = Intent(this, MapsActivity::class.java)
                     intent.putExtra("sessionId",mySession.sessionId)
                     startActivity(intent)
+                } else {
+                    setErrorOnUiThread("Erreur de connexion")
                 }
             }
         }
@@ -39,9 +41,30 @@ class SimpleLoginActivity : AppCompatActivity() {
         thread {
             val mySession = WSUtils.subscribe(user)
             runOnUiThread { println("**************************"+mySession.sessionId) }
-
-            val intent = Intent(this, MapsActivity::class.java)
-            startActivity(intent)
+                if (mySession.success){
+                    val intent = Intent(this, MapsActivity::class.java)
+                    intent.putExtra("sessionId",mySession.sessionId)
+                    startActivity(intent)
+                } else {
+                    setErrorOnUiThread("Erreur pendant l'inscription")
+                }
         }
+    }
+
+    /* -------------------------------- */
+    // Méthode de mise à jour de l'ihm
+    /* -------------------------------- */
+
+    fun setErrorOnUiThread(text: String?) = runOnUiThread {
+        if (text.isNullOrBlank()) {
+            tvError.visibility = View.GONE
+        } else {
+            tvError.visibility = View.VISIBLE
+        }
+        tvError.text = text
+    }
+
+    fun showProgressBar(visible: Boolean) = runOnUiThread {
+        progressBar.visibility = if (visible) View.VISIBLE else View.GONE
     }
 }

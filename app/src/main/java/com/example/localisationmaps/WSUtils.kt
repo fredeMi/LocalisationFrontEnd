@@ -16,16 +16,12 @@ class WSUtils {
              OkhttpUtils().sendPostOkHttpRequest("${Constant.URL}/updatePlace", userInJson)
         }
 
-
         fun getPlaces(): ArrayList<UserBean> {
-
             val userListJson =
                 OkhttpUtils().sendGetOkHttpRequest("${Constant.URL}/places")
-
             val myType = object : TypeToken<List<UserBean>>() {}.type
             return gson.fromJson(userListJson, myType)
         }
-
 
         fun login(user: UserBean):SessionBean{
             val userInJson = gson.toJson(user)
