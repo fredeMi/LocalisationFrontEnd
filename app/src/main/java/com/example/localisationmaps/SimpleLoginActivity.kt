@@ -23,12 +23,14 @@ class SimpleLoginActivity : AppCompatActivity() {
         val user = UserBean(null,null, null,  tvPseudo.text.toString(), tvPwd.text.toString())
         thread {
             val mySession = WSUtils.login(user)
-            runOnUiThread { println("**************************"+mySession.session_id) }
-
-            val intent = Intent(this, MapsActivity::class.java)
-            startActivity(intent)
+            runOnUiThread { println("**************************session:${mySession.sessionId} et success = ${mySession.success}")
+                if (mySession.success){
+                    val intent = Intent(this, MapsActivity::class.java)
+                    intent.putExtra("sessionId",mySession.sessionId)
+                    startActivity(intent)
+                }
+            }
         }
-
     }
 
     fun onBtnSubscribeClick(view: View) {
@@ -36,7 +38,7 @@ class SimpleLoginActivity : AppCompatActivity() {
         val user = UserBean(null,null, null,  tvPseudo.text.toString(), tvPwd.text.toString())
         thread {
             val mySession = WSUtils.subscribe(user)
-            runOnUiThread { println("**************************"+mySession.session_id) }
+            runOnUiThread { println("**************************"+mySession.sessionId) }
 
             val intent = Intent(this, MapsActivity::class.java)
             startActivity(intent)

@@ -30,8 +30,8 @@ class WSUtils {
         fun login(user: UserBean):SessionBean{
             val userInJson = gson.toJson(user)
             val sessionOk = OkhttpUtils().sendPostOkHttpRequest("${Constant.URL}/login", userInJson)
-            val mySession = object : TypeToken<SessionBean>() {}.type
-            return gson.fromJson(sessionOk,mySession)
+//            val mySession = object : TypeToken<SessionBean>() {}.type
+            return gson.fromJson(sessionOk, SessionBean::class.java)
         }
 
         fun subscribe(user: UserBean): SessionBean{

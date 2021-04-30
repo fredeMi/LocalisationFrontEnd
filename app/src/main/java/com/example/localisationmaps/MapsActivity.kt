@@ -22,7 +22,8 @@ import kotlin.concurrent.thread
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var mMap: GoogleMap? = null
-    val data = ArrayList<UserBean>()
+    private val data = ArrayList<UserBean>()
+    private var sessionId:Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,11 +47,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             )
         }
 
+        sessionId = intent.getIntExtra("sessionId",0)
         thread {
             while (true) {
+                println("entree thread oncreate maps ******************************************")
+                println("*************************** dans maps $sessionId")
+
                 val location = getLocation()
                 if (location != null) {
-                    val myUser = UserBean(null, location.lat, location.lon, null, null)
+                    val myUser = UserBean(sessionId, location.lat, location.lon, null, null)
                     try {
                         WSUtils.updatePlace(myUser)
                     } catch (e: Exception) {
@@ -130,6 +135,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
     }
+
 
     fun loadData() {
         thread {
