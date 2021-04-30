@@ -18,48 +18,48 @@ class SimpleLoginActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(R.layout.activity_simple_login)
     }
 
-    override fun onClick(v: View?) {
-        when (v) {
-            btnLogin -> {
-                if (tvPseudo.text.toString().isEmpty() && tvPwd.text.toString().isEmpty()){
-                    setErrorOnUiThread("Les champs doivent etre rempli")
-                }
-            }
-            btnSubscribe -> {
-                if (tvPseudo.text.toString().isEmpty() && tvPwd.text.toString().isEmpty()){
-                    setErrorOnUiThread("Les champs doivent etre rempli")
-                }
-            }
-        }
-    }
 
     fun onBtnLoginClick(view: View) {
         println("********************************clic")
-        val user = UserBean(null,null, null,  tvPseudo.text.toString(), tvPwd.text.toString())
+        val user = UserBean(null, null, null, tvPseudo.text.toString(), tvPwd.text.toString())
+
+        val pseudo = tvPseudo.text.toString()
+        val pwd = tvPwd.text.toString()
+
         thread {
-            val mySession = WSUtils.login(user)
-            runOnUiThread {
+            if (pseudo.isNotBlank() && pseudo.isNotEmpty() && pwd.isNotBlank() && pwd.isNotEmpty() ) {
+                try {
+                    val mySession = WSUtils.login(user)
+                    runOnUiThread {
 //                println("**************************session:${mySession.sessionId} et success = ${mySession.success}")
-                if (mySession.success){
-                    val intent = Intent(this, MapsActivity::class.java)
-                    intent.putExtra("sessionId",mySession.sessionId)
-                    startActivity(intent)
+                        if (mySession.success) {
+                            val intent = Intent(this, MapsActivity::class.java)
+                            intent.putExtra("sessionId", mySession.sessionId)
+                            startActivity(intent)
+                        }
+                    }
+
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    setErrorOnUiThread(e.message)
                 }
+            } else {
+                setErrorOnUiThread("L'utilisateur doit remplir tous les champs")
             }
         }
     }
 
     fun onBtnSubscribeClick(view: View) {
         println("********************************clic")
-        val user = UserBean(null,null, null,  tvPseudo.text.toString(), tvPwd.text.toString())
+        val user = UserBean(null, null, null, tvPseudo.text.toString(), tvPwd.text.toString())
         thread {
             val mySession = WSUtils.subscribe(user)
-            runOnUiThread { println("**************************"+mySession.sessionId) }
-                if (mySession.success){
-                    val intent = Intent(this, MapsActivity::class.java)
-                    intent.putExtra("sessionId",mySession.sessionId)
-                    startActivity(intent)
-                }
+            runOnUiThread { println("**************************" + mySession.sessionId) }
+            if (mySession.success) {
+                val intent = Intent(this, MapsActivity::class.java)
+                intent.putExtra("sessionId", mySession.sessionId)
+                startActivity(intent)
+            }
         }
     }
 
