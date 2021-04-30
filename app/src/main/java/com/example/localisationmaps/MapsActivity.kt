@@ -7,6 +7,7 @@ import android.location.Criteria
 import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -149,5 +150,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 //                TODO gérer affichage erreur sur IHM
             }
         }
+    }
+
+    fun onBtnLogoutClick(view: View) {
+        finish()
     }
 }
