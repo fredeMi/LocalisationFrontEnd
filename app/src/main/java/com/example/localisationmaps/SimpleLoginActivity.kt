@@ -1,5 +1,6 @@
 package com.example.localisationmaps
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 
 import android.os.Bundle
@@ -17,17 +18,28 @@ class SimpleLoginActivity : AppCompatActivity() {
     }
 
 
-    fun OnBtnSubscribeClick(view: View) {
-
-
-    }
-
     fun onBtnLoginClick(view: View) {
         println("********************************clic")
-        val user = UserBean(0, null,0.0, 0.0,  tvPseudo.text.toString(), tvPwd.text.toString(), null)
+        val user = UserBean(null,null, null,  tvPseudo.text.toString(), tvPwd.text.toString())
         thread {
             val mySession = WSUtils.login(user)
             runOnUiThread { println("**************************"+mySession.session_id) }
+
+            val intent = Intent(this, MapsActivity::class.java)
+            startActivity(intent)
+        }
+
+    }
+
+    fun onBtnSubscribeClick(view: View) {
+        println("********************************clic")
+        val user = UserBean(null,null, null,  tvPseudo.text.toString(), tvPwd.text.toString())
+        thread {
+            val mySession = WSUtils.subscribe(user)
+            runOnUiThread { println("**************************"+mySession.session_id) }
+
+            val intent = Intent(this, MapsActivity::class.java)
+            startActivity(intent)
         }
     }
 }
